@@ -6,5 +6,15 @@ namespace Siskop
         {
             InitializeComponent();
         }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void PasswordBox_TextChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }
