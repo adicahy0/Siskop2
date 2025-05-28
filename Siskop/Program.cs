@@ -213,3 +213,169 @@ namespace Siskop
         }
     }
 }
+
+public class PinjamanModel
+{
+    private List<Pinjaman> Pinjamans = new List<Pinjaman>();
+    private readonly string connectionString;
+
+    // Event for notifying views when data changes
+    public event Action DataChanged;
+
+    public PinjamanModel(string connectionString)
+    {
+        this.connectionString = connectionString;
+        LoadFromDatabase(); // Load initial data
+    }
+
+    public async Task AddPinjaman(int idNasabah, decimal jumlahPinjaman, string keterangan, decimal bunga)
+    {
+        var pinjaman = new Pinjaman
+        {
+            Id_Nasabah = idNasabah.ToString(),
+            Jumlah_pinjaman = jumlahPinjaman,
+            Keterangan = keterangan,
+            Bunga = bunga,
+            Saldo_pinjaman = jumlahPinjaman, // Initially, saldo equals jumlah pinjaman
+            CreatedAt = DateTime.Now
+        };
+
+        using var connection = new NpgsqlConnection(connectionString);
+
+        var sql = @"INSERT INTO Pinjamans (Id_Nasabah, Jumlah_pinjaman, Keterangan, Bunga, Saldo_pinjaman, CreatedAt) 
+                    VALUES (@Id_Nasabah, @Jumlah_pinjaman, @Keterangan, @Bunga, @Saldo_pinjaman, @CreatedAt) 
+                    RETURNING ID_Pinjaman";
+
+        pinjaman.ID_Pinjaman = await connection.ExecuteScalarAsync<string>(sql, pinjaman);
+
+        // Update in-memory cache
+        Pinjamans.Add(pinjaman);
+        DataChanged?.Invoke(); // Views update automatically
+    }
+
+    public async Task RemovePinjaman(int index)
+    {
+        if (index < 0 || index >= Pinjamans.Count) return;
+
+        var pinjaman = Pinjamans[index];
+
+        using var connection = new NpgsqlConnection(connectionString);
+
+        var sql = "DELETE FROM Pinjamans WHERE ID_Pinjaman = @ID_Pinjaman";
+        await connection.ExecuteAsync(sql, new { ID_Pinjaman = pinjaman.ID_Pinjaman });
+
+        // Update in-memory cache
+        Pinjamans.RemoveAt(index);
+        DataChanged?.Invoke();
+    }
+
+    public async Task UpdateSaldoPinjaman(string idPinjaman, decimal newSaldo)
+    {
+        var pinjaman = Pinjamans.FirstOrDefault(p => p.ID_Pinjaman == idPinjaman);
+        if (pinjaman == null) return;
+
+        using var connection = new NpgsqlConnection(connectionString);
+
+        var sql = "UPDATE Pinjamans SET Saldo_pinjaman = @Saldo WHERE ID_Pinjaman = @ID_Pinjaman";
+        await connection.ExecuteAsync(sql, new { Saldo = newSaldo, ID_Pinjaman = idPinjaman });
+
+        // Update in-memory cache
+        pinjaman.Saldo_pinjaman = newSaldo;
+        DataChanged?.Invoke();
+    }
+
+    public async Task MakePayment(string idPinjaman, decimal paymentAmount)
+    {
+        var pinjaman = Pinjamans.FirstOrDefault(p => p.ID_Pinjaman == idPinjaman);
+        if (pinjaman == null) return;
+
+        if (paymentAmount <= 0 || paymentAmount > pinjaman.Saldo_pinjaman)
+            throw new ArgumentException("Invalid payment amount");
+
+        var newSaldo = pinjaman.Saldo_pinjaman - paymentAmount;
+        await UpdateSaldoPinjaman(idPinjaman, newSaldo);
+    }
+
+    public async Task<List<Pinjaman>> GetPinjamansByNasabah(int idNasabah)
+    {
+        using var connection = new NpgsqlConnection(connectionString);
+
+        var sql = @"SELECT ID_Pinjaman, Id_Nasabah, Jumlah_pinjaman, Keterangan, 
+                           Bunga, Saldo_pinjaman, CreatedAt 
+                    FROM Pinjamans 
+                    WHERE Id_Nasabah = @Id_Nasabah 
+                    ORDER BY CreatedAt DESC";
+
+        var pinjamans = await connection.QueryAsync<Pinjaman>(sql, new { Id_Nasabah = idNasabah.ToString() });
+        return pinjamans.ToList();
+    }
+
+    public async Task<decimal> GetTotalOutstandingDebt(int idNasabah)
+    {
+        using var connection = new NpgsqlConnection(connectionString);
+
+        var sql = @"SELECT COALESCE(SUM(Saldo_pinjaman), 0) 
+                    FROM Pinjamans 
+                    WHERE Id_Nasabah = @Id_Nasabah AND Saldo_pinjaman > 0";
+
+        return await connection.ExecuteScalarAsync<decimal>(sql, new { Id_Nasabah = idNasabah.ToString() });
+    }
+
+    public List<Pinjaman> GetActivePinjamans()
+    {
+        return Pinjamans.Where(p => p.Saldo_pinjaman > 0).ToList();
+    }
+
+    public List<Pinjaman> GetPaidOffPinjamans()
+    {
+        return Pinjamans.Where(p => p.Saldo_pinjaman == 0).ToList();
+    }
+
+    private async void LoadFromDatabase()
+    {
+        using var connection = new NpgsqlConnection(connectionString);
+
+        var sql = @"SELECT ID_Pinjaman, Id_Nasabah, Jumlah_pinjaman, Keterangan, 
+                           Bunga, Saldo_pinjaman, CreatedAt 
+                    FROM Pinjamans 
+                    ORDER BY CreatedAt DESC";
+
+        Pinjamans = (await connection.QueryAsync<Pinjaman>(sql)).ToList();
+        DataChanged?.Invoke(); // Notify views after initial load
+    }
+
+    public List<Pinjaman> GetPinjamans() => new List<Pinjaman>(Pinjamans);
+
+    // Method to refresh from database (useful for multi-user scenarios)
+    public void RefreshFromDatabase() => LoadFromDatabase();
+}
+
+public class Pinjaman
+{
+    public string ID_Pinjaman { get; set; }
+    public string Id_Nasabah { get; set; }
+    public decimal Jumlah_pinjaman { get; set; }
+    public string Keterangan { get; set; }
+    public decimal Bunga { get; set; }
+    public decimal Saldo_pinjaman { get; set; }
+    public DateTime CreatedAt { get; set; }
+
+    // Constructor for creating new pinjaman
+    public Pinjaman() { }
+
+    public Pinjaman(int idNasabah, decimal jumlahPinjaman, string keterangan, decimal bunga)
+    {
+        Id_Nasabah = idNasabah.ToString();
+        Jumlah_pinjaman = jumlahPinjaman;
+        Keterangan = keterangan ?? "";
+        Bunga = bunga;
+        Saldo_pinjaman = jumlahPinjaman; // Initially full amount
+        CreatedAt = DateTime.Now;
+    }
+
+    // Helper properties for business logic
+    public decimal TotalAmountWithInterest => Jumlah_pinjaman + (Jumlah_pinjaman * Bunga / 100);
+    public decimal AmountPaid => Jumlah_pinjaman - Saldo_pinjaman;
+    public bool IsFullyPaid => Saldo_pinjaman == 0;
+    public decimal InterestAmount => Jumlah_pinjaman * Bunga / 100;
+}
