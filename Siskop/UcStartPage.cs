@@ -30,10 +30,6 @@ namespace project_ecoranger.Views
             mainForm.ShowPage(mainForm.loginPage);
         }
 
-        private void registerbtn_Click(object sender, EventArgs e)
-        {
-            mainForm.ShowPage(mainForm.registerpage);
 
-        }
     }
 }

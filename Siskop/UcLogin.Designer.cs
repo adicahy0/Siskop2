@@ -30,7 +30,6 @@
         {
             panel1 = new Panel();
             panel2 = new Panel();
-            cbRole = new ComboBox();
             tbPassword = new TextBox();
             tbUsername = new TextBox();
             btnLogin = new Panel();
@@ -51,25 +50,12 @@
             // 
             panel2.BackColor = Color.Transparent;
             panel2.BackgroundImageLayout = ImageLayout.Zoom;
-            panel2.Controls.Add(cbRole);
             panel2.Controls.Add(tbPassword);
             panel2.Controls.Add(tbUsername);
             panel2.Location = new Point(1163, 197);
             panel2.Name = "panel2";
             panel2.Size = new Size(527, 452);
             panel2.TabIndex = 2;
-            // 
-            // cbRole
-            // 
-            cbRole.DropDownStyle = ComboBoxStyle.DropDownList;
-            cbRole.FlatStyle = FlatStyle.Popup;
-            cbRole.Font = new Font("Segoe UI Semibold", 15.75F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            cbRole.FormattingEnabled = true;
-            cbRole.Location = new Point(93, 399);
-            cbRole.Name = "cbRole";
-            cbRole.Size = new Size(409, 38);
-            cbRole.TabIndex = 2;
-            cbRole.SelectedIndexChanged += comboBox1_SelectedIndexChanged;
             // 
             // tbPassword
             // 
@@ -99,16 +85,7 @@
             btnLogin.Size = new Size(409, 104);
             btnLogin.TabIndex = 3;
             btnLogin.Click += btnLogin_Click;
-            btnLogin.Paint += btnLogin_Paint;
-            // 
-            // btnToRegister
-
-            btnToRegister.BackgroundImageLayout = ImageLayout.Zoom;
-            btnToRegister.Location = new Point(1320, 818);
-            btnToRegister.Name = "btnToRegister";
-            btnToRegister.Size = new Size(267, 34);
-            btnToRegister.TabIndex = 4;
-            btnToRegister.Click += btnToRegister_Click;
+ 
             // 
             // UcLogin
             // 
@@ -120,7 +97,6 @@
             Controls.Add(panel1);
             Name = "UcLogin";
             Size = new Size(1920, 1074);
-            Load += UcLogin_Load;
             panel2.ResumeLayout(false);
             panel2.PerformLayout();
             ResumeLayout(false);
@@ -134,6 +110,5 @@
         private Panel btnToRegister;
         private TextBox tbPassword;
         private TextBox tbUsername;
-        private ComboBox cbRole;
     }
 }
