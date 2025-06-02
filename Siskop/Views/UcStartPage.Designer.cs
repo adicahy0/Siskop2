@@ -47,7 +47,8 @@
             // pictureBox2
             // 
             pictureBox2.BackColor = Color.Transparent;
-            pictureBox2.Location = new Point(571, 287);
+            pictureBox2.BackgroundImage = Siskop.Properties.Resources.Untitled;
+            pictureBox2.Location = new Point(575, 287);
             pictureBox2.Name = "pictureBox2";
             pictureBox2.Size = new Size(878, 320);
             pictureBox2.SizeMode = PictureBoxSizeMode.Zoom;
@@ -67,13 +68,10 @@
             // 
             // registerbtn
             // 
-            registerbtn.BackColor = Color.Transparent;
-            registerbtn.BackgroundImageLayout = ImageLayout.Zoom;
-            registerbtn.Location = new Point(1018, 613);
+            registerbtn.Location = new Point(0, 0);
             registerbtn.Name = "registerbtn";
-            registerbtn.Size = new Size(240, 100);
-            registerbtn.TabIndex = 3;
-            registerbtn.Click += registerbtn_Click;
+            registerbtn.Size = new Size(200, 100);
+            registerbtn.TabIndex = 0;
             // 
             // UcStartPage
             // 
@@ -84,7 +82,7 @@
             Controls.Add(pictureBox2);
             Controls.Add(pictureBox1);
             Name = "UcStartPage";
-            Size = new Size(1920, 1060);
+            Size = new Size(1366, 768);
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox2).EndInit();
             ResumeLayout(false);

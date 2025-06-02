@@ -30,7 +30,6 @@
         {
             panel1 = new Panel();
             panel2 = new Panel();
-            cbRole = new ComboBox();
             tbPassword = new TextBox();
             tbUsername = new TextBox();
             btnLogin = new Panel();
@@ -46,30 +45,18 @@
             panel1.Name = "panel1";
             panel1.Size = new Size(776, 336);
             panel1.TabIndex = 0;
+            panel1.Paint += panel1_Paint;
             // 
             // panel2
             // 
             panel2.BackColor = Color.Transparent;
             panel2.BackgroundImageLayout = ImageLayout.Zoom;
-            panel2.Controls.Add(cbRole);
             panel2.Controls.Add(tbPassword);
             panel2.Controls.Add(tbUsername);
-            panel2.Location = new Point(1163, 197);
+            panel2.Location = new Point(835, 158);
             panel2.Name = "panel2";
             panel2.Size = new Size(527, 452);
             panel2.TabIndex = 2;
-            // 
-            // cbRole
-            // 
-            cbRole.DropDownStyle = ComboBoxStyle.DropDownList;
-            cbRole.FlatStyle = FlatStyle.Popup;
-            cbRole.Font = new Font("Segoe UI Semibold", 15.75F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            cbRole.FormattingEnabled = true;
-            cbRole.Location = new Point(93, 399);
-            cbRole.Name = "cbRole";
-            cbRole.Size = new Size(409, 38);
-            cbRole.TabIndex = 2;
-            cbRole.SelectedIndexChanged += comboBox1_SelectedIndexChanged;
             // 
             // tbPassword
             // 
@@ -94,21 +81,18 @@
             btnLogin.BackColor = Color.Transparent;
             btnLogin.BackgroundImageLayout = ImageLayout.Stretch;
             btnLogin.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            btnLogin.Location = new Point(1256, 708);
+            btnLogin.Location = new Point(860, 686);
             btnLogin.Name = "btnLogin";
             btnLogin.Size = new Size(409, 104);
             btnLogin.TabIndex = 3;
             btnLogin.Click += btnLogin_Click;
-            btnLogin.Paint += btnLogin_Paint;
             // 
             // btnToRegister
-
-            btnToRegister.BackgroundImageLayout = ImageLayout.Zoom;
-            btnToRegister.Location = new Point(1320, 818);
+            // 
+            btnToRegister.Location = new Point(0, 0);
             btnToRegister.Name = "btnToRegister";
-            btnToRegister.Size = new Size(267, 34);
-            btnToRegister.TabIndex = 4;
-            btnToRegister.Click += btnToRegister_Click;
+            btnToRegister.Size = new Size(200, 100);
+            btnToRegister.TabIndex = 0;
             // 
             // UcLogin
             // 
@@ -120,7 +104,6 @@
             Controls.Add(panel1);
             Name = "UcLogin";
             Size = new Size(1920, 1074);
-            Load += UcLogin_Load;
             panel2.ResumeLayout(false);
             panel2.PerformLayout();
             ResumeLayout(false);
@@ -134,6 +117,5 @@
         private Panel btnToRegister;
         private TextBox tbPassword;
         private TextBox tbUsername;
-        private ComboBox cbRole;
     }
 }

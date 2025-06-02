@@ -9,8 +9,7 @@ using System.Drawing;
 using Dapper;
 using Npgsql;
 
-
-namespace Siskop
+namespace Models
 {
     public class NasabahModel
     {
@@ -145,7 +144,7 @@ namespace Siskop
                 using var connection = new NpgsqlConnection(connectionString);
 
                 var user = await connection.QuerySingleOrDefaultAsync<User>(
-                    "SELECT Id, Username, PasswordHash, Role, CreatedAt FROM Users WHERE Username = @Username",
+                    "SELECT Id, username, password, role  FROM Users WHERE Username = @Username",
                     new { Username = username });
 
                 if (user == null)
@@ -154,11 +153,11 @@ namespace Siskop
                     return false;
                 }
 
-                if (!user.VerifyPassword(password))
-                {
-                    LoginFailed?.Invoke("Invalid password");
-                    return false;
-                }
+                //if (!user.VerifyPassword(password))
+                //{
+                //    LoginFailed?.Invoke("Invalid password");
+                //    return false;
+                //}
 
                 currentUser = user;
                 UserLoggedIn?.Invoke(user);

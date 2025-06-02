@@ -1,108 +1,89 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Npgsql;
-using project_ecoranger.Models;
-
+using Models;
 
 namespace project_ecoranger.Views
 {
     public partial class UcLogin : UserControl
     {
-        MainForm mainForm;
-        PenyuplaiContext penyuplai;
-        PengepulContext pengepul;
-        private int id;
-        public UcLogin(MainForm mainForm)
+        private readonly MainForm _mainForm;
+        private readonly AuthModel _authModel;
+
+        public UcLogin(MainForm mainForm, string connstring)
         {
             InitializeComponent();
-            cbRole.Items.Add("Pengepul");
-            cbRole.Items.Add("Penyuplai");
-            this.mainForm = mainForm;
-            penyuplai = new PenyuplaiContext();
-            pengepul = new PengepulContext();
-            clearTextBox();
-        }
-        private void btnLogin_Paint(object sender, PaintEventArgs e)
-        {
-
+            _mainForm = mainForm;
+            _authModel = new AuthModel(connstring);
+            ClearTextBox();
         }
 
-        private void UcLogin_Load(object sender, EventArgs e)
+        private async void btnLogin_Click(object sender, EventArgs e)
         {
+            string username = tbUsername.Text.Trim();
+            string password = tbPassword.Text;
 
-        }
+            // Validate input fields
+            if (string.IsNullOrWhiteSpace(username) ||
+                string.IsNullOrWhiteSpace(password))
+            {
+                ShowWarning("Username, Password, and Role must be filled!");
+                return;
+            }
 
-        private void btnLogin_Click(object sender, EventArgs e)
-        {
             try
             {
-                string username = tbUsername.Text;
-                string password = tbPassword.Text;
-                string role = cbRole.SelectedItem?.ToString();
+                bool loginSuccess = await _authModel.LoginAsync(username, password)
+                    .ConfigureAwait(true);  // Ensure UI thread context
 
-                if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(role))
+                if (loginSuccess)
                 {
-                    MessageBox.Show("Username dan Password Tidak Boleh Kosong", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("horeee");
+                    // Role-based navigation (uncomment when ready)
+                    // NavigateBasedOnRole(selectedRole);
                 }
                 else
                 {
-                    if (role == "Penyuplai")
-                    {
-
-                        if (penyuplai.LoginPenyuplai(username, password, out id))
-                        {
-                            mainForm.dashboardPenyuplai.setSesion(id);
-                            mainForm.ShowPage(mainForm.dashboardPenyuplai);
-                            clearTextBox();
-                        }
-                        else
-                        {
-                            MessageBox.Show("Username atau Password Salah", "Kesalahan", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        }
-                    }
-                    else if (role == "Pengepul")
-                    {
-                        if (pengepul.LoginPengepul(username, password))
-                        {
-                            mainForm.dashboardPengepul.SetSesion();
-                            mainForm.ShowPage(mainForm.dashboardPengepul);
-                            clearTextBox();
-                        }
-                        else
-                        {
-                            MessageBox.Show("Username atau Password Salah", "Kesalahan", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        }
-                    }
+                    ShowWarning("Invalid username or password");
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Terjadi kesalahan: " + ex.Message, "Kesalahan", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ShowError($"Login failed: {ex.Message}");
             }
         }
-        public void clearTextBox()
+
+
+        // Private helper methods
+        private void ClearTextBox()
         {
             tbUsername.Clear();
             tbPassword.Clear();
-            cbRole.SelectedIndex = -1;
+            tbUsername.Focus();  // Improve UX
         }
 
-        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        private void ShowWarning(string message)
         {
-
+            MessageBox.Show(message, "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
 
-        private void btnToRegister_Click(object sender, EventArgs e)
+        private void ShowError(string message)
+        {
+            MessageBox.Show(message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+
+        // Future role-based navigation
+        private void NavigateBasedOnRole(string role)
+        {
+            // if (role == "Penyuplai")
+            //     _mainForm.ShowPage(_mainForm.penyuplaiPage);
+            // else if (role == "Pengepul")
+            //     _mainForm.ShowPage(_mainForm.pengepulPage);
+        }
+
+        private void panel1_Paint(object sender, PaintEventArgs e)
         {
 
-            mainForm.ShowPage(mainForm.registerpage);
         }
     }
 }
