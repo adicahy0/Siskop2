@@ -45,6 +45,7 @@
             panel1.Name = "panel1";
             panel1.Size = new Size(776, 336);
             panel1.TabIndex = 0;
+            panel1.Paint += panel1_Paint;
             // 
             // panel2
             // 
@@ -52,7 +53,7 @@
             panel2.BackgroundImageLayout = ImageLayout.Zoom;
             panel2.Controls.Add(tbPassword);
             panel2.Controls.Add(tbUsername);
-            panel2.Location = new Point(1163, 197);
+            panel2.Location = new Point(835, 158);
             panel2.Name = "panel2";
             panel2.Size = new Size(527, 452);
             panel2.TabIndex = 2;
@@ -80,12 +81,18 @@
             btnLogin.BackColor = Color.Transparent;
             btnLogin.BackgroundImageLayout = ImageLayout.Stretch;
             btnLogin.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            btnLogin.Location = new Point(1256, 708);
+            btnLogin.Location = new Point(860, 686);
             btnLogin.Name = "btnLogin";
             btnLogin.Size = new Size(409, 104);
             btnLogin.TabIndex = 3;
             btnLogin.Click += btnLogin_Click;
- 
+            // 
+            // btnToRegister
+            // 
+            btnToRegister.Location = new Point(0, 0);
+            btnToRegister.Name = "btnToRegister";
+            btnToRegister.Size = new Size(200, 100);
+            btnToRegister.TabIndex = 0;
             // 
             // UcLogin
             // 

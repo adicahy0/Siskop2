@@ -13,7 +13,7 @@ namespace project_ecoranger
         System.Windows.Forms.Timer timer;
         public MainForm()
         {
-            connString = "Host=localhost;Username=postgres;Password=Gunungsari;Database=ecorangerv2";
+            connString = "Host=localhost;Username=postgres;Password=kanokon132;Database=users";
             InitializeComponent();
             loadingScreen = new UcLoadingScreen();
             startPage = new UcStartPage(this);
@@ -32,7 +32,7 @@ namespace project_ecoranger
             //timer.Interval = 2500;
             //timer.Tick += timer_tick;
             //timer.Start();
-
+            ShowPage(loginPage);
         }
         public void HideAllPage()
         {

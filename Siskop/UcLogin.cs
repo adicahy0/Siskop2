@@ -38,6 +38,7 @@ namespace project_ecoranger.Views
 
                 if (loginSuccess)
                 {
+                    MessageBox.Show("horeee");
                     // Role-based navigation (uncomment when ready)
                     // NavigateBasedOnRole(selectedRole);
                 }
@@ -78,6 +79,11 @@ namespace project_ecoranger.Views
             //     _mainForm.ShowPage(_mainForm.penyuplaiPage);
             // else if (role == "Pengepul")
             //     _mainForm.ShowPage(_mainForm.pengepulPage);
+        }
+
+        private void panel1_Paint(object sender, PaintEventArgs e)
+        {
+
         }
     }
 }

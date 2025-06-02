@@ -82,7 +82,7 @@
             Controls.Add(pictureBox2);
             Controls.Add(pictureBox1);
             Name = "UcStartPage";
-            Size = new Size(1920, 1060);
+            Size = new Size(1366, 768);
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox2).EndInit();
             ResumeLayout(false);
