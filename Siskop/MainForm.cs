@@ -6,8 +6,6 @@ namespace project_ecoranger
     public partial class MainForm : Form
     {
         private readonly string connString;
-        public UcLoadingScreen loadingScreen;
-        public UcStartPage startPage;
         public UcLogin loginPage;
 
         System.Windows.Forms.Timer timer;
@@ -15,11 +13,8 @@ namespace project_ecoranger
         {
             connString = "Host=localhost;Username=postgres;Password=kanokon132;Database=users";
             InitializeComponent();
-            loadingScreen = new UcLoadingScreen();
-            startPage = new UcStartPage(this);
             loginPage = new UcLogin(this, connString);
 
-            this.Controls.Add(startPage);
             this.Controls.Add(loginPage);
 
             HideAllPage();
@@ -44,7 +39,6 @@ namespace project_ecoranger
         public void timer_tick(object sender, EventArgs e)
         {
             timer.Stop();
-            ShowPage(startPage);
 
         }
         public void ShowPage(UserControl uc)
