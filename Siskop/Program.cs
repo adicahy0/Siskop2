@@ -9,6 +9,7 @@ using System.Drawing;
 using Dapper;
 using Npgsql;
 
+
 namespace Siskop
 {
     public class NasabahModel
