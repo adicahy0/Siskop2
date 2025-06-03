@@ -13,9 +13,12 @@
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
-            if (disposing && (components != null))
+            if (disposing)
             {
-                components.Dispose();
+                if (_nasabahModel != null)
+                {
+                    _nasabahModel.DataChanged -= LoadNasabahPanels;
+                }
             }
             base.Dispose(disposing);
         }
@@ -33,6 +36,7 @@
             // 
             // flowLayoutPanel1
             // 
+            flowLayoutPanel1.FlowDirection = FlowDirection.TopDown;
             flowLayoutPanel1.Location = new Point(398, 163);
             flowLayoutPanel1.Name = "flowLayoutPanel1";
             flowLayoutPanel1.Size = new Size(900, 535);

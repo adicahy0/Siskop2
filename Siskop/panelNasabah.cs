@@ -13,9 +13,25 @@ namespace Siskop
 {
     public partial class panelNasabah : UserControl
     {
-        public int NasabahId { get; set; }
-        public string NasabahNama { get; set; }
-        
+        private int _nasabahId;
+        private string _nasabahNama;
+
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public int NasabahId
+        {
+            get { return _nasabahId; }
+            set { _nasabahId = value; }
+        }
+
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public string NasabahNama
+        {
+            get { return _nasabahNama ?? string.Empty; }
+            set { _nasabahNama = value; }
+        }
+
         // Parameterless constructor for designer
         public panelNasabah()
         {
@@ -31,15 +47,18 @@ namespace Siskop
         // Consolidated data setting logic
         public void SetNasabahData(Nasabah nasabah)
         {
-            NasabahId = nasabah.Id;
-            NasabahNama = nasabah.Nama;
-            label2.Text = $"{nasabah.Id}";
-            lbNama.Text = nasabah.Nama;
+            if (nasabah != null)
+            {
+                NasabahId = nasabah.Id;
+                NasabahNama = nasabah.Nama;
+                label2.Text = $"{nasabah.Id}";
+                lbNama.Text = nasabah.Nama ?? string.Empty;
+            }
         }
 
         private void pictureBox1_Click(object sender, EventArgs e)
         {
-            // Existing event handler
+            MessageBox.Show("horeee");
         }
     }
 }

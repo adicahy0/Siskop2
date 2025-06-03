@@ -65,7 +65,7 @@ namespace Models
             using var connection = new NpgsqlConnection(connectionString);
 
             // Using Dapper's QueryAsync for loading data
-            var sql = "SELECT Id, Nama, Alamat, Pekerjaan FROM Nasabahs";
+            var sql = "SELECT Id, Nama, Alamat, Pekerjaan FROM Nasabah";
             Nasabahs = (await connection.QueryAsync<Nasabah>(sql)).ToList();
 
             DataChanged?.Invoke(); // Notify views after initial load

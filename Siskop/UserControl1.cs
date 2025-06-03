@@ -8,61 +8,66 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Models;
+using project_ecoranger;
 
 namespace Siskop
 {
-    public partial class UserControl1: UserControl
+    public partial class UserControl1 : UserControl
     {
-            private readonly NasabahModel nasabahModel;
-            private readonly FlowLayoutPanel flowLayoutPanel;
+        private readonly MainForm _mainForm;
+        private readonly NasabahModel _nasabahModel;
 
-        nasabahModel.DataChanged += LoadNasabahPanels;
-        
-        // Initial load
-        LoadNasabahPanels();
-    }
+        private readonly FlowLayoutPanel flowLayoutPanel;
 
-    private void LoadNasabahPanels()
+        public UserControl1(MainForm mainForm, string connstring)
         {
-            // Clear existing panels
-            flowLayoutPanel.Controls.Clear();
+            InitializeComponent();
+            _mainForm = mainForm;
+            _nasabahModel = new NasabahModel(connstring);
 
-            // Get current nasabah list
-            var nasabahs = nasabahModel.GetNasabahs();
+            // Subscribe to data changes
+            _nasabahModel.DataChanged += LoadNasabahPanels;
 
-            // Create and add panels
-            foreach (var nasabah in nasabahs)
+            // Initial load
+            LoadNasabahPanels();
+        }
+
+        private void LoadNasabahPanels()
+        {
+            try
             {
-                var panel = new NasabahPanel
+                // Clear existing panels
+                flowLayoutPanel1.Controls.Clear();
+
+                // Get current nasabah list
+                var nasabahs = _nasabahModel.GetNasabahs();
+
+                // Create and add panels
+                foreach (var nasabah in nasabahs)
                 {
-                    Margin = new Padding(10),
-                    Width = 200,
-                    Height = 80
-                };
+                    var panel = new panelNasabah(nasabah)
+                    {
+                        Margin = new Padding(5),
+                    };
 
-                panel.SetNasabahData(nasabah);
 
-                // Optional: Handle click events
-                panel.PanelClicked += (sender, e) =>
-                {
-                    var clickedPanel = (NasabahPanel)sender;
-                    MessageBox.Show($"Selected: {clickedPanel.NasabahNama}\nID: {clickedPanel.NasabahId}");
-                };
-
-                flowLayoutPanel.Controls.Add(panel);
+                    flowLayoutPanel1.Controls.Add(panel);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading nasabah panels: {ex.Message}", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        // Cleanup on form close
-        protected override void OnFormClosing(FormClosingEventArgs e)
+        // Method to refresh the panels manually if needed
+        public void RefreshPanels()
         {
-            nasabahModel.DataChanged -= LoadNasabahPanels;
-            base.OnFormClosing(e);
+            LoadNasabahPanels();
         }
 
-        public UserControl1()
-        {
-            InitializeComponent();
-        }
+        // Cleanup on disposal
+       
     }
 }

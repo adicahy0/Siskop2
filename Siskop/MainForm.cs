@@ -1,5 +1,6 @@
 using System.Net;
 using project_ecoranger.Views;
+using Siskop;
 
 namespace project_ecoranger
 {
@@ -7,6 +8,7 @@ namespace project_ecoranger
     {
         private readonly string connString;
         public UcLogin loginPage;
+        public UserControl1 adminDash;
 
         System.Windows.Forms.Timer timer;
         public MainForm()
@@ -14,9 +16,10 @@ namespace project_ecoranger
             connString = "Host=localhost;Username=postgres;Password=kanokon132;Database=users";
             InitializeComponent();
             loginPage = new UcLogin(this, connString);
+            adminDash = new UserControl1(this, connString);
 
             this.Controls.Add(loginPage);
-
+            this.Controls.Add(adminDash);
             HideAllPage();
             //this.Controls.Add(dashboardPengepul);
             //dashboardPenyuplai.Visible = true;
@@ -27,7 +30,7 @@ namespace project_ecoranger
             //timer.Interval = 2500;
             //timer.Tick += timer_tick;
             //timer.Start();
-            ShowPage(loginPage);
+            ShowPage(adminDash);
         }
         public void HideAllPage()
         {
