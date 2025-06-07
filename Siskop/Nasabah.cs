@@ -35,7 +35,7 @@ namespace Siskop
             LoadNasabahPanels();
         }
 
-        private void LoadNasabahPanels()
+        public void LoadNasabahPanels()
         {
             try
             {
@@ -65,7 +65,7 @@ namespace Siskop
             {
                 foreach (var nasabah in nasabahList)
                 {
-                    var panel = new panelNasabah(nasabah)
+                    var panel = new panelNasabah(_mainForm, nasabah)
                     {
                         Margin = new Padding(5),
                     };
@@ -95,7 +95,7 @@ namespace Siskop
                 {
                     // Filter nasabah based on search query (Id only)
                     var filteredNasabah = allNasabah
-                        .Where(n => n.Id_Nasabah.ToString().Contains(query))
+                        .Where(n => n.id_Nasabah.ToString().Contains(query))
                         .ToList();
 
                     PopulateNasabahLayout(filteredNasabah);

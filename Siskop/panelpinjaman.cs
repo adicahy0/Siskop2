@@ -19,7 +19,7 @@ namespace Siskop
 
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public string PinjamanId;
+        public int PinjamanId;
 
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -43,11 +43,11 @@ namespace Siskop
         {
             if (Pinjaman != null)
             {
-                PinjamanId = Pinjaman.Id_Pinjaman;
+                PinjamanId = Pinjaman.id_Pinjaman;
                 PinjamanKeterangan = Pinjaman.Keterangan;
                 SaldoPinjaman = Pinjaman.Saldo_pinjaman;
 
-                lbId.Text = $"{Pinjaman.Id_Pinjaman}";
+                lbId.Text = $"{Pinjaman.id_Pinjaman}";
                 lbSaldo.Text = $"{Pinjaman.Saldo_pinjaman}";
                 lbKeterangan.Text = Pinjaman.Keterangan ?? string.Empty;
             }

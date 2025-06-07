@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Models;
+using project_ecoranger;
 
 namespace Siskop
 {
@@ -15,6 +16,7 @@ namespace Siskop
     {
         private int _nasabahId;
         private string _nasabahNama;
+        private readonly MainForm _mainForm;
 
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -38,7 +40,14 @@ namespace Siskop
             InitializeComponent();
         }
 
-        // Modified constructor to chain to parameterless version
+        // Constructor with MainForm reference
+        public panelNasabah(MainForm mainForm,Nasabah nasabah) : this()
+        {
+            _mainForm = mainForm;
+            SetNasabahData(nasabah);
+        }
+
+        // Modified constructor to chain to parameterless version (kept for backward compatibility)
         public panelNasabah(Nasabah nasabah) : this()
         {
             SetNasabahData(nasabah);
@@ -49,16 +58,27 @@ namespace Siskop
         {
             if (nasabah != null)
             {
-                NasabahId = nasabah.Id_Nasabah;
+                NasabahId = nasabah.id_Nasabah;
                 NasabahNama = nasabah.Nama;
-                label2.Text = $"{nasabah.Id_Nasabah}";
+                label2.Text = $"{nasabah.id_Nasabah}";
                 lbNama.Text = nasabah.Nama ?? string.Empty;
             }
         }
 
         private void pictureBox1_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("horeee");
+            // Navigate to pinjaman control with filtered data for this nasabah
+            if (_mainForm != null && NasabahId > 0)
+            {
+                _mainForm.ShowPinjamanForNasabah(NasabahId);
+            }
+            else
+            {
+                MessageBox.Show("Unable to load pinjaman data. MainForm reference or Nasabah ID is missing.",
+                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
         }
+
+
     }
 }

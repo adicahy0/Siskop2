@@ -34,9 +34,9 @@ namespace Models
             // Using Dapper's ExecuteScalarAsync for insertion with returning ID
             var sql = @"INSERT INTO Nasabahs (Nama, Alamat, Pekerjaan) 
                         VALUES (@Nama, @Alamat, @Pekerjaan) 
-                        RETURNING Id";
+                        RETURNING id_Nasabah";
 
-            nasabah.Id_Nasabah = await connection.ExecuteScalarAsync<int>(sql, nasabah);
+            nasabah.id_Nasabah = await connection.ExecuteScalarAsync<int>(sql, nasabah);
 
             // Then update in-memory cache
             Nasabahs.Add(nasabah);
@@ -51,9 +51,9 @@ namespace Models
 
             using var connection = new NpgsqlConnection(connectionString);
 
-            // Using Dapper's ExecuteAsync for deletion
-            var sql = "DELETE FROM Nasabahs WHERE Id = @Id";
-            await connection.ExecuteAsync(sql, new { Id = nasabah.Id_Nasabah });
+            // Use Id_Nasabah instead of Id
+            var sql = "DELETE FROM Nasabahs WHERE Id_nasabah = @Id_Nasabah";
+            await connection.ExecuteAsync(sql, new { Id_Nasabah = nasabah.id_Nasabah });
 
             // Then update in-memory cache
             Nasabahs.RemoveAt(index);
@@ -64,8 +64,9 @@ namespace Models
         {
             using var connection = new NpgsqlConnection(connectionString);
 
-            // Using Dapper's QueryAsync for loading data
-            var sql = "SELECT Id, Nama, Alamat, Pekerjaan FROM Nasabah";
+            // Use consistent table name (Nasabahs, not Nasabah)
+            // Map 'Id' column to 'Id_Nasabah' property
+            var sql = "SELECT Id_Nasabah, Nama, Alamat, Pekerjaan FROM Nasabahs";
             Nasabahs = (await connection.QueryAsync<Nasabah>(sql)).ToList();
 
             DataChanged?.Invoke(); // Notify views after initial load
@@ -79,7 +80,7 @@ namespace Models
 
     public class Nasabah
     {
-        public int Id_Nasabah { get; set; }
+        public int id_Nasabah { get; set; }
         public required string Nama { get; set; }
         public required string Alamat { get; set; }
         public string Pekerjaan { get; set; }
@@ -144,7 +145,7 @@ namespace Models
                 using var connection = new NpgsqlConnection(connectionString);
 
                 var user = await connection.QuerySingleOrDefaultAsync<User>(
-                    "SELECT Id, username, password, role  FROM Users WHERE Username = @Username",
+                    "SELECT id_Nasabah, username, password, role  FROM Users WHERE Username = @Username",
                     new { Username = username });
 
                 if (user == null)
@@ -191,8 +192,8 @@ namespace Models
                 var user = new User(username, role, password);
 
                 var sql = @"INSERT INTO Users (Username, PasswordHash, Role, CreatedAt) 
-                       OUTPUT INSERTED.Id 
-                       VALUES (@Username, @PasswordHash, @Role, @CreatedAt)";
+                           OUTPUT INSERTED.Id 
+                           VALUES (@Username, @PasswordHash, @Role, @CreatedAt)";
 
                 user.Id = await connection.QuerySingleAsync<int>(sql, user);
 
@@ -235,7 +236,7 @@ public class PinjamanModel
 
         var pinjaman = new Pinjaman
         {
-            Id_Nasabah = idNasabah.ToString(),
+            id_Nasabah = idNasabah,
             Jumlah_pinjaman = jumlahPinjaman,
             Keterangan = keterangan,
             Durasi = durasi,
@@ -247,51 +248,50 @@ public class PinjamanModel
         using var connection = new NpgsqlConnection(connectionString);
 
         // Fixed SQL: Added missing @Durasi parameter
-        var sql = @"INSERT INTO Pinjamans (Id_Nasabah, Jumlah_pinjaman, Keterangan, Durasi, Bunga, Saldo_pinjaman, CreatedAt) 
-                    VALUES (@Id_Nasabah, @Jumlah_pinjaman, @Keterangan, @Durasi, @Bunga, @Saldo_pinjaman, @CreatedAt) 
-                    RETURNING ID_Pinjaman";
+        var sql = @"INSERT INTO Pinjamans (id_Nasabah, Jumlah_pinjaman, Keterangan, Durasi, Bunga, Saldo_pinjaman, CreatedAt) 
+                    VALUES (@id_Nasabah, @Jumlah_pinjaman, @Keterangan, @Durasi, @Bunga, @Saldo_pinjaman, @CreatedAt) 
+                    RETURNING id_Pinjaman";
 
-        pinjaman.Id_Pinjaman = await connection.ExecuteScalarAsync<string>(sql, pinjaman);
+        pinjaman.id_Pinjaman = await connection.ExecuteScalarAsync<int>(sql, pinjaman);
 
         Pinjamans.Add(pinjaman);
         DataChanged?.Invoke();
     }
 
 
-public async Task RemovePinjaman(int index)
+    public async Task RemovePinjaman(int pinjamanId)
     {
-        if (index < 0 || index >= Pinjamans.Count) return;
-
-        var pinjaman = Pinjamans[index];
-
-        using var connection = new NpgsqlConnection(connectionString);
-
-        var sql = "DELETE FROM Pinjamans WHERE ID_Pinjaman = @ID_Pinjaman";
-        await connection.ExecuteAsync(sql, new { Id_Pinjaman = pinjaman.Id_Pinjaman });
-
-        // Update in-memory cache
-        Pinjamans.RemoveAt(index);
-        DataChanged?.Invoke();
-    }
-
-    public async Task UpdateSaldoPinjaman(string idPinjaman, decimal newSaldo)
-    {
-        var pinjaman = Pinjamans.FirstOrDefault(p => p.Id_Pinjaman == idPinjaman);
+        var pinjaman = Pinjamans.FirstOrDefault(p => p.id_Pinjaman == pinjamanId);
         if (pinjaman == null) return;
 
         using var connection = new NpgsqlConnection(connectionString);
 
-        var sql = "UPDATE Pinjamans SET Saldo_pinjaman = @Saldo WHERE ID_Pinjaman = @ID_Pinjaman";
-        await connection.ExecuteAsync(sql, new { Saldo = newSaldo, ID_Pinjaman = idPinjaman });
+        var sql = "DELETE FROM Pinjamans WHERE ID_Pinjaman = @ID_Pinjaman";
+        await connection.ExecuteAsync(sql, new { ID_Pinjaman = pinjamanId });
+
+        // Update in-memory cache
+        Pinjamans.Remove(pinjaman);
+        DataChanged?.Invoke();
+    }
+
+    public async Task UpdateSaldoPinjaman(int idPinjaman, decimal newSaldo)
+    {
+        var pinjaman = Pinjamans.FirstOrDefault(p => p.id_Pinjaman == idPinjaman);
+        if (pinjaman == null) return;
+
+        using var connection = new NpgsqlConnection(connectionString);
+
+        var sql = "UPDATE Pinjamans SET Saldo_pinjaman = @Saldo WHERE id_Pinjaman = @id_Pinjaman";
+        await connection.ExecuteAsync(sql, new { Saldo = newSaldo, id_Pinjaman = idPinjaman });
 
         // Update in-memory cache
         pinjaman.Saldo_pinjaman = newSaldo;
         DataChanged?.Invoke();
     }
 
-    public async Task MakePayment(string idPinjaman, decimal paymentAmount)
+    public async Task MakePayment(int idPinjaman, decimal paymentAmount)
     {
-        var pinjaman = Pinjamans.FirstOrDefault(p => p.Id_Pinjaman == idPinjaman);
+        var pinjaman = Pinjamans.FirstOrDefault(p => p.id_Pinjaman == idPinjaman);
         if (pinjaman == null) return;
 
         if (paymentAmount <= 0 || paymentAmount > pinjaman.Saldo_pinjaman)
@@ -306,12 +306,12 @@ public async Task RemovePinjaman(int index)
         using var connection = new NpgsqlConnection(connectionString);
 
         var sql = @"SELECT ID_Pinjaman, Id_Nasabah, Jumlah_pinjaman, Keterangan, 
-                           Bunga, Saldo_pinjaman, CreatedAt 
-                    FROM Pinjamans 
-                    WHERE Id_Nasabah = @Id_Nasabah 
-                    ORDER BY CreatedAt DESC";
+                       Durasi, Bunga, Saldo_pinjaman, CreatedAt 
+                FROM Pinjamans 
+                WHERE Id_Nasabah = @Id_Nasabah 
+                ORDER BY CreatedAt DESC";
 
-        var pinjamans = await connection.QueryAsync<Pinjaman>(sql, new { Id_Nasabah = idNasabah.ToString() });
+        var pinjamans = await connection.QueryAsync<Pinjaman>(sql, new { Id_Nasabah = idNasabah });
         return pinjamans.ToList();
     }
 
@@ -321,9 +321,9 @@ public async Task RemovePinjaman(int index)
 
         var sql = @"SELECT COALESCE(SUM(Saldo_pinjaman), 0) 
                     FROM Pinjamans 
-                    WHERE Id_Nasabah = @Id_Nasabah AND Saldo_pinjaman > 0";
+                    WHERE id_Nasabah = @id_Nasabah AND Saldo_pinjaman > 0";
 
-        return await connection.ExecuteScalarAsync<decimal>(sql, new { Id_Nasabah = idNasabah.ToString() });
+        return await connection.ExecuteScalarAsync<decimal>(sql, new { id_Nasabah = idNasabah });
     }
 
     public List<Pinjaman> GetActivePinjamans()
@@ -341,47 +341,35 @@ public async Task RemovePinjaman(int index)
         using var connection = new NpgsqlConnection(connectionString);
 
         var sql = @"SELECT ID_Pinjaman, Id_Nasabah, Jumlah_pinjaman, Keterangan, 
-                           Bunga, Saldo_pinjaman, CreatedAt 
-                    FROM Pinjamans 
-                    ORDER BY CreatedAt DESC";
+                       Durasi, Bunga, Saldo_pinjaman, CreatedAt 
+                FROM Pinjamans 
+                ORDER BY CreatedAt DESC";
 
         Pinjamans = (await connection.QueryAsync<Pinjaman>(sql)).ToList();
         DataChanged?.Invoke(); // Notify views after initial load
     }
-
-    public List<Pinjaman> GetPinjamans() => new List<Pinjaman>(Pinjamans);
-
-    // Method to refresh from database (useful for multi-user scenarios)
-    public void RefreshFromDatabase() => LoadFromDatabase();
 }
-
 public class Pinjaman
-{
-    public string Id_Pinjaman { get; set; }
-    public string Id_Nasabah { get; set; }
-    public decimal Jumlah_pinjaman { get; set; }
-    public string Keterangan { get; set; }
-    public int Durasi { get; set; } 
-    public decimal Bunga { get; set; }
-    public decimal Saldo_pinjaman { get; set; }
-    public DateTime CreatedAt { get; set; }
-
-    // Constructor for creating new pinjaman
-    public Pinjaman() { }
-
-    public Pinjaman(string idNasabah, decimal jumlahPinjaman, string keterangan, decimal bunga)
     {
-        Id_Nasabah = idNasabah.ToString();
-        Jumlah_pinjaman = jumlahPinjaman;
-        Keterangan = keterangan ?? "";
-        Bunga = bunga;
-        Saldo_pinjaman = jumlahPinjaman; // Initially full amount
-        CreatedAt = DateTime.Now;
-    }
+        public int id_Pinjaman { get; set; }
+        public int id_Nasabah { get; set; }
+        public decimal Jumlah_pinjaman { get; set; }
+        public string Keterangan { get; set; }
+        public int Durasi { get; set; }
+        public decimal Bunga { get; set; }
+        public decimal Saldo_pinjaman { get; set; }
+        public DateTime CreatedAt { get; set; }
 
-    // Helper properties for business logic
-    public decimal TotalAmountWithInterest => Jumlah_pinjaman + (Jumlah_pinjaman * Bunga / 100);
-    public decimal AmountPaid => Jumlah_pinjaman - Saldo_pinjaman;
-    public bool IsFullyPaid => Saldo_pinjaman == 0;
-    public decimal InterestAmount => Jumlah_pinjaman * Bunga / 100;
-}
+        // Constructor for creating new pinjaman
+        public Pinjaman() { }
+
+        public Pinjaman(int idNasabah, decimal jumlahPinjaman, string keterangan, decimal bunga)
+        {
+            id_Nasabah = idNasabah;
+            Jumlah_pinjaman = jumlahPinjaman;
+            Keterangan = keterangan ?? "";
+            Bunga = bunga;
+            Saldo_pinjaman = jumlahPinjaman; // Initially full amount
+            CreatedAt = DateTime.Now;
+        }
+    }

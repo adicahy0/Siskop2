@@ -17,16 +17,18 @@ namespace Siskop
         private readonly MainForm _mainForm;
         private readonly PinjamanModel _pinjamanModel;
         private readonly FlowLayoutPanel flowLayoutPanel;
-        private List<Pinjaman> allpinjaman; // Store all pinjaman data for searching
+        private List<Pinjaman> filteredpinjaman; // Store filtered pinjaman data for specific nasabah
+        private int _nasabahId; // Store the specific nasabah ID
 
-        public PinjamanControl(MainForm mainForm, string connstring)
+        public PinjamanControl(MainForm mainForm, string connstring, int nasabahId)
         {
             InitializeComponent();
             _mainForm = mainForm;
             _pinjamanModel = new PinjamanModel(connstring);
+            _nasabahId = nasabahId;
 
             // Initialize the list
-            allpinjaman = new List<Pinjaman>();
+            filteredpinjaman = new List<Pinjaman>();
 
             // Subscribe to data changes
             _pinjamanModel.DataChanged += LoadPinjamanPanels;
@@ -35,15 +37,15 @@ namespace Siskop
             LoadPinjamanPanels();
         }
 
-        private void LoadPinjamanPanels()
+        private async void LoadPinjamanPanels()
         {
             try
             {
-                // Get current pinjaman list and store it
-                allpinjaman = _pinjamanModel.GetPinjamans();
+                // Get pinjaman list for specific nasabah only
+                filteredpinjaman = await _pinjamanModel.GetPinjamansByNasabah(_nasabahId);
 
-                // Populate with all data
-                PopulatepinjamanLayout(allpinjaman);
+                // Populate with filtered data
+                PopulatepinjamanLayout(filteredpinjaman);
             }
             catch (Exception ex)
             {
@@ -79,17 +81,13 @@ namespace Siskop
             }
         }
 
-        // Method to clear search and show all
+        // Method to clear search and show all pinjamans for this nasabah
         public void ClearSearch()
         {
-            PopulatepinjamanLayout(allpinjaman);
+            PopulatepinjamanLayout(filteredpinjaman);
         }
 
         // Method to refresh the panels manually if needed
-        public void RefreshPanels()
-        {
-            LoadPinjamanPanels();
-        }
 
         // Method to get current pinjaman count (useful for status display)
         public int GetCurrentpinjamanCount()
@@ -97,10 +95,34 @@ namespace Siskop
             return flowLayoutPanel1.Controls.Count;
         }
 
-        // Method to get total pinjaman count
+        // Method to get total pinjaman count for this nasabah
         public int GetTotalpinjamanCount()
         {
-            return allpinjaman?.Count ?? 0;
+            return filteredpinjaman?.Count ?? 0;
+        }
+
+        // Method to get total outstanding debt for this nasabah
+        public async Task<decimal> GetTotalOutstandingDebt()
+        {
+            return await _pinjamanModel.GetTotalOutstandingDebt(_nasabahId);
+        }
+
+        // Method to get only active pinjamans for this nasabah
+        public List<Pinjaman> GetActivePinjamans()
+        {
+            return filteredpinjaman?.Where(p => p.Saldo_pinjaman > 0).ToList() ?? new List<Pinjaman>();
+        }
+
+        // Method to get only paid off pinjamans for this nasabah
+        public List<Pinjaman> GetPaidOffPinjamans()
+        {
+            return filteredpinjaman?.Where(p => p.Saldo_pinjaman == 0).ToList() ?? new List<Pinjaman>();
+        }
+
+        // Method to get a specific pinjaman by ID
+        public Pinjaman GetPinjamanById(int pinjamanId)
+        {
+            return filteredpinjaman?.FirstOrDefault(p => p.id_Pinjaman == pinjamanId);
         }
 
         private void vScrollBar1_Scroll(object sender, ScrollEventArgs e)
@@ -109,7 +131,5 @@ namespace Siskop
         }
 
         // Cleanup on disposal
-
-
     }
 }
