@@ -49,9 +49,9 @@ namespace Siskop
         {
             if (nasabah != null)
             {
-                NasabahId = nasabah.Id;
+                NasabahId = nasabah.Id_Nasabah;
                 NasabahNama = nasabah.Nama;
-                label2.Text = $"{nasabah.Id}";
+                label2.Text = $"{nasabah.Id_Nasabah}";
                 lbNama.Text = nasabah.Nama ?? string.Empty;
             }
         }

@@ -37,10 +37,10 @@
             // lbNama
             // 
             lbNama.BackColor = Color.Transparent;
-            lbNama.Font = new Font("Times New Roman", 21.75F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            lbNama.Location = new Point(319, 10);
+            lbNama.Font = new Font("Times New Roman", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            lbNama.Location = new Point(322, 10);
             lbNama.Name = "lbNama";
-            lbNama.Size = new Size(561, 37);
+            lbNama.Size = new Size(244, 26);
             lbNama.TabIndex = 1;
             lbNama.Text = "Nama";
             lbNama.TextAlign = ContentAlignment.MiddleLeft;
@@ -49,9 +49,9 @@
             // 
             label2.BackColor = Color.Transparent;
             label2.Font = new Font("Times New Roman", 21.75F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            label2.Location = new Point(19, 10);
+            label2.Location = new Point(17, 15);
             label2.Name = "label2";
-            label2.Size = new Size(206, 37);
+            label2.Size = new Size(190, 21);
             label2.TabIndex = 3;
             label2.Text = "ID";
             label2.TextAlign = ContentAlignment.MiddleLeft;
@@ -74,7 +74,7 @@
             Controls.Add(lbNama);
             Controls.Add(pictureBox1);
             Name = "panelNasabah";
-            Size = new Size(900, 60);
+            Size = new Size(900, 49);
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ResumeLayout(false);
         }

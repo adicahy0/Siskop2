@@ -1,6 +1,6 @@
 ﻿namespace Siskop
 {
-    partial class UserControl1
+    partial class PinjamanControl
     {
         /// <summary> 
         /// Required designer variable.
@@ -15,9 +15,9 @@
         {
             if (disposing)
             {
-                if (_nasabahModel != null)
+                if (_pinjamanModel != null)
                 {
-                    _nasabahModel.DataChanged -= LoadNasabahPanels;
+                    _pinjamanModel.DataChanged -= LoadPinjamanPanels;
                 }
             }
             base.Dispose(disposing);
@@ -36,18 +36,22 @@
             // 
             // flowLayoutPanel1
             // 
+            flowLayoutPanel1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            flowLayoutPanel1.AutoScroll = true;
             flowLayoutPanel1.FlowDirection = FlowDirection.TopDown;
-            flowLayoutPanel1.Location = new Point(398, 163);
+            flowLayoutPanel1.Location = new Point(384, 163);
             flowLayoutPanel1.Name = "flowLayoutPanel1";
-            flowLayoutPanel1.Size = new Size(900, 535);
+            flowLayoutPanel1.Size = new Size(914, 535);
             flowLayoutPanel1.TabIndex = 0;
+            flowLayoutPanel1.WrapContents = false;
             // 
-            // UserControl1
+            // PinjamanControl
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
+            AutoScroll = true;
             Controls.Add(flowLayoutPanel1);
-            Name = "UserControl1";
+            Name = "PinjamanControl";
             Size = new Size(1366, 768);
             ResumeLayout(false);
         }

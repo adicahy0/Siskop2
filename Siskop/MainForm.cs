@@ -8,7 +8,8 @@ namespace project_ecoranger
     {
         private readonly string connString;
         public UcLogin loginPage;
-        public UserControl1 adminDash;
+        public UserControl1 NasabahDash;
+        public PinjamanControl PinjamanDash;
 
         System.Windows.Forms.Timer timer;
         public MainForm()
@@ -16,10 +17,10 @@ namespace project_ecoranger
             connString = "Host=localhost;Username=postgres;Password=kanokon132;Database=users";
             InitializeComponent();
             loginPage = new UcLogin(this, connString);
-            adminDash = new UserControl1(this, connString);
-
+            NasabahDash = new UserControl1(this, connString);
+            PinjamanDash = new PinjamanControl (this, connString);
             this.Controls.Add(loginPage);
-            this.Controls.Add(adminDash);
+            this.Controls.Add(NasabahDash);
             HideAllPage();
             //this.Controls.Add(dashboardPengepul);
             //dashboardPenyuplai.Visible = true;
@@ -30,7 +31,7 @@ namespace project_ecoranger
             //timer.Interval = 2500;
             //timer.Tick += timer_tick;
             //timer.Start();
-            ShowPage(adminDash);
+            ShowPage(NasabahDash);
         }
         public void HideAllPage()
         {
